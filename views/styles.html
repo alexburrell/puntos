@@ -1,0 +1,219 @@
+
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro&family=Walter+Turncoat&family=Dawning+of+a+New+Day&display=swap" rel="stylesheet">
+
+<style>
+
+body {
+  font-family: 'Walter Turncoat', sans-serif;
+  margin: 0;
+  padding-bottom: 150px;
+}
+
+.plain {
+  font-family: 'Source Sans Pro', sans-serif;
+}
+
+.unselected {
+  opacity: 0.3;
+  text-decoration: line-through;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.faded {
+  opacity: 0.3;
+}
+
+ul {
+  padding: 0;
+}
+
+.relative {
+  position: relative;
+}
+
+.center {
+  text-align: center;
+}
+
+.right {
+  text-align: right;
+}
+
+.float-right {
+  float: right;
+}
+
+.inline {
+  display: inline-block;
+  vertical-align: top;
+}
+
+.header {
+  border-bottom: solid 1px #CCC;
+  padding: 0 20px;
+}
+
+.team-name {
+  margin: 30px 0 0 0;
+}
+
+.social-distancing .team-name {
+  letter-spacing: 15px;
+}
+
+.footer {
+  background: #FFF;
+  border-top: solid 1px #CCC;
+
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+#final-tally {
+  background: #000;
+  color: #FFF;
+  font-size: 48px;
+  text-align: right;
+  padding: 10px 20px;
+}
+
+.options li {
+  margin-right: 20px;
+}
+
+.voter {
+  margin: 0 10px;
+}
+
+.social-distancing .voter {
+  margin: 0 50px;
+}
+
+.voter img {
+  height: 200px;
+}
+
+.mystery-box {
+  height: 30px !important;
+}
+
+.voter-vote {
+  position: absolute;
+  top: 10px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 22px;
+}
+
+.my-options li {
+  margin: 0 10px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.my-options li img {
+  height: 35px;
+}
+
+.me {
+  border: solid 0.5px;
+  border-radius: 4px;
+  padding: 0 8px;
+  position: relative;
+  font-size: 15px;
+  font-family: 'Dawning of a New Day', serif;
+}
+
+.me-stripe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: blue;
+}
+
+.evict {
+  opacity: 0;
+}
+
+.my-options:hover .evict {
+  opacity: 0.3;
+}
+
+.evict-color {
+  display: none;
+}
+
+.vote-value {
+  font-size: 32px;
+  margin: 0 5px;
+  width: 60px;
+}
+
+.vote-value:hover {
+  cursor: pointer;
+}
+
+
+.tooltip {
+  position: relative;
+}
+
+/* Tooltip text */
+.tooltip .tooltip-text {
+  font-size: 12px;
+
+  visibility: hidden;
+  width: 100px;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 6px;
+
+  /* Position the tooltip text */
+  position: absolute;
+  z-index: 1;
+  top: 135%;
+  left: 50%;
+  margin-left: -50px;
+
+  /* Fade in tooltip */
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+/* Tooltip arrow */
+.tooltip .tooltip-text::after {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent transparent #555 transparent;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
+.credits {
+  background: #000;
+  color: #FFF;
+  text-align: center;
+  font-size: 14px;
+  padding: 5px;
+}
+
+</style>

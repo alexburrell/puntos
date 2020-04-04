@@ -1,0 +1,247 @@
+
+<!doctype html>
+
+<html>
+  <head>
+    <title>Puntos {{team}}</title>
+
+    {{> styles}}
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.3.0/mustache.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      Mustache.tags = ["[[", "]]"];
+
+      function getRandomColor() {
+        var letters = '0123456789ABCDEF';
+        var color = '';
+        for (var i = 0; i < 6; i++) {
+          color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+      }
+
+      var socket = io();
+      var team = "{{team}}";
+      var color = window.localStorage.getItem('puntos-identity');
+      if (!color) {
+        color = getRandomColor();
+        window.localStorage.setItem('puntos-identity', color);
+      }
+
+      socket.on("connect", function() {
+        socket.emit("join", {
+          "team": team,
+          "color": color
+        });
+
+        socket.on("roster", function(roster) {
+          console.log(roster);
+
+          var voterMarkup = "";
+          var meMarkup = "";
+          for (var member of roster.members) {
+            if (member.color == color) {
+              meMarkup = Mustache.render($("#voter").html(), {
+                "member": member,
+                "me": true,
+                "showVote": roster.average > 0
+              });
+            } else {
+              voterMarkup += Mustache.render($("#voter").html(), {
+                "member": member,
+                "me": false,
+                "showVote": roster.average > 0
+              });
+            }
+          }
+
+          if (roster.average) {
+            $("#final-tally").html(Mustache.render($("#final-tally-template").html(), {
+              "average": roster.average
+            }));
+          } else {
+            $("#final-tally").html("");
+          }
+
+          $("#voters").html(meMarkup + voterMarkup);
+
+          $(".evict").click(function(e) {
+            socket.emit("evict", {
+              "team": team,
+              "color": $(e.target).children('.evict-color').html()
+            });
+          });
+
+          $(".new-color").click(function(e) {
+            socket.emit("evict", {
+              "team": team,
+              "color": color
+            });
+
+            color = getRandomColor();
+            window.localStorage.setItem('puntos-identity', color);
+
+            socket.emit("join", {
+              "team": team,
+              "color": color
+            });
+          });
+
+          $(".lurk").click(function(e) {
+            socket.emit("lurk", {
+              "team": team,
+              "color": color
+            });
+          });
+
+          $(".participate").click(function(e) {
+            socket.emit("participate", {
+              "team": team,
+              "color": color
+            });
+          });
+        });
+
+        socket.on("votes-cleared", function() {
+          $('.vote-value.selected').removeClass('selected');
+        });
+
+        $("#styles").html(Mustache.render($("#color-styles").html(), {"color": color}));
+
+        $('.vote-value').click(function(e) {
+          var vote = null;
+
+          if ($(e.target).hasClass('selected')) {
+            $(e.target).removeClass('selected')
+          } else {
+            $('li.selected').removeClass('selected');
+            $(e.target).addClass('selected');
+
+            if (e.target.innerText == '?') {
+              vote = e.target.innerText;
+            } else {
+              vote = parseInt(e.target.innerText);
+            }
+          }
+
+          socket.emit("vote", {
+            "team": team,
+            "color": color,
+            "vote": vote
+          });
+        });
+
+        $("#social-distancing").click(function(e) {
+          if ($(e.target).hasClass("selected")) {
+            $(e.target).removeClass("selected");
+            $(e.target).addClass("unselected");
+            $("body").removeClass("social-distancing");
+          } else {
+            $(e.target).removeClass("unselected");
+            $(e.target).addClass("selected");
+            $("body").addClass("social-distancing");
+          }
+        });
+
+        $("#new-test-member").click(function(e) {
+          socket.emit("new-test-member", {
+            "team": team,
+            "color": getRandomColor()
+          });
+        });
+
+        $("#clear-all-votes").click(function(e) {
+          socket.emit("clear-all-votes", {
+            "team": team
+          });
+        });
+      });
+    </script>
+  </head>
+
+  <body>
+    {{> header}}
+
+    <ul class="options right plain">
+      <!-- <li id="new-test-member" class="inline clickable">New test member</li> -->
+      <li id="social-distancing" class="inline unselected clickable">Social distancing</li>
+      <li id="clear-all-votes" class="inline clickable">Clear all votes</li>
+    </ul>
+
+    <div id="voters" class="center"></div>
+
+    {{> footer}}
+
+    <div id="styles"></div>
+
+    <script type="text/html" id="voter">
+      <div class="voter inline relative [[#member.lurker]]faded[[/member.lurker]]">
+        <div class="inline" style="background: #[[member.color]]">
+          [[#member.vote]]
+            <img src="up.png" />
+            <div class="voter-vote">
+              [[#showVote]]
+                [[member.vote]]
+              [[/showVote]]
+              [[^showVote]]
+                <img src="mystery.png" class="mystery-box" />
+              [[/showVote]]
+            </div>
+          [[/member.vote]]
+          [[^member.vote]]
+            <img src="down.png" />
+          [[/member.vote]]
+        </div>
+
+        <ul class="my-options plain">
+          [[#me]]
+            <li class="inline me">
+              <span class="me-stripe"></span>
+              me
+            </li>
+            [[^member.lurker]]
+              <li class="clickable lurk tooltip">
+                <img src="spy.png" />
+                <span class="tooltip-text">Lurk</span>
+              </li>
+            [[/member.lurker]]
+            [[#member.lurker]]
+              <li class="clickable participate tooltip">
+                <img src="chat.png" />
+                <span class="tooltip-text">Participate</span>
+              </li>
+            [[/member.lurker]]
+            <li class="clickable new-color tooltip">
+              <img src="paint.png" />
+              <span class="tooltip-text">Change my color</span>
+            </li>
+          [[/me]]
+          [[^me]]
+            <li class="clickable evict">
+              Evict <span class="evict-color">[[member.color]]</span>
+            </li>
+          [[/me]]
+        </ul>
+      </div>
+    </script>
+
+    <script type="text/html" id="final-tally-template">
+      [[average]] puntos
+    </script>
+
+    <script type="text/html" id="color-styles">
+      <style>
+      .vote-value:hover {
+        color: #[[color]];
+      }
+
+      .vote-value.selected {
+        color: #[[color]];
+        text-shadow: 0 0 10px #[[color]];
+      }
+      </style>
+    </script>
+  </body>
+</html>
