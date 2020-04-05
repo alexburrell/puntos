@@ -106,6 +106,7 @@ function clearVotes(team) {
 function leaveTeam(team, member) {
   if (rosters[team] && rosters[team][member]) {
     rosters[team][member].active = false;
+    rosters[team][member].vote = null;
   }
 }
 
