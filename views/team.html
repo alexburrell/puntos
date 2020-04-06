@@ -29,6 +29,7 @@
         color = getRandomColor();
         window.localStorage.setItem('puntos-identity', color);
       }
+      var lurker = false;
 
       socket.on("connect", function() {
         socket.emit("join", {
@@ -37,8 +38,6 @@
         });
 
         socket.on("roster", function(roster) {
-          console.log(roster);
-
           var voterMarkup = "";
           var meMarkup = "";
           for (var member of roster.members) {
@@ -94,6 +93,7 @@
               "team": team,
               "color": color
             });
+            lurker = true;
           });
 
           $(".participate").click(function(e) {
@@ -101,6 +101,7 @@
               "team": team,
               "color": color
             });
+            lurker = false;
           });
         });
 
@@ -111,6 +112,10 @@
         $("#styles").html(Mustache.render($("#color-styles").html(), {"color": color}));
 
         $('.vote-value').click(function(e) {
+          if (lurker) {
+            return;
+          }
+
           var vote = null;
 
           if ($(e.target).hasClass('selected')) {
@@ -134,13 +139,13 @@
         });
 
         $("#social-distancing").click(function(e) {
-          if ($(e.target).hasClass("selected")) {
-            $(e.target).removeClass("selected");
-            $(e.target).addClass("unselected");
+          if ($(e.target).hasClass("if-selected")) {
+            $(".sd-selected").addClass("sd-unselected");
+            $(".sd-selected").removeClass("sd-selected");
             $("body").removeClass("social-distancing");
           } else {
-            $(e.target).removeClass("unselected");
-            $(e.target).addClass("selected");
+            $(".sd-unselected").addClass("sd-selected");
+            $(".sd-unselected").removeClass("sd-unselected");
             $("body").addClass("social-distancing");
           }
         });
@@ -165,8 +170,11 @@
     {{> header}}
 
     <ul class="options right plain">
-      <!-- <li id="new-test-member" class="inline clickable">New test member</li> -->
-      <li id="social-distancing" class="inline unselected clickable">Social distancing</li>
+      <li id="new-test-member" class="inline clickable">New test member</li>
+      <li id="social-distancing" class="inline clickable sd-unselected">
+        <span class="if-unselected">Practice social distancing</span>
+        <span class="if-selected">Stop social distancing</span>
+      </li>
       <li id="clear-all-votes" class="inline clickable">Clear all votes</li>
     </ul>
 

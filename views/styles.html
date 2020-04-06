@@ -13,9 +13,12 @@ body {
   font-family: 'Source Sans Pro', sans-serif;
 }
 
-.unselected {
-  opacity: 0.3;
-  text-decoration: line-through;
+.sd-unselected .if-selected {
+  display: none;
+}
+
+.sd-selected .if-unselected {
+  display: none;
 }
 
 .clickable {
@@ -140,11 +143,11 @@ ul {
 }
 
 .evict {
-  opacity: 0;
+  opacity: 0.1;
 }
 
 .my-options:hover .evict {
-  opacity: 0.3;
+  opacity: 0.5;
 }
 
 .evict-color {
